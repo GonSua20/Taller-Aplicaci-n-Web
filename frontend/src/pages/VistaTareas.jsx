@@ -15,7 +15,7 @@ export default function VistaTareas() {
   // Estado para el formulario unificado
   const [formulario, setFormulario] = useState({
     // El formulario tiene un id_task para saber si estamos editando (si tiene valor) o creando (si es null).
-    id_task: null, title: '', description: '', id_user: ''
+    id_task: null, title: '', description: '', id_user: '', status: 'Pendiente'
   });
 
   // Cargar tareas y usuarios al montar el componente
@@ -64,7 +64,7 @@ export default function VistaTareas() {
         setTareas([...tareas, res.data]);
       }
       // Limpiamos el formulario después de guardar
-      setFormulario({ id_task: null, title: '', description: '', id_user: '' });
+      setFormulario({ id_task: null, title: '', description: '', id_user: '', status: 'Pendiente' });
       // Si ocurre un error durante la petición, se captura y se muestra un mensaje de error en la consola.
     } catch (error) { console.error("Error al guardar tarea", error); }
   };
@@ -72,7 +72,7 @@ export default function VistaTareas() {
   //Función para preparar la edición de una tarea. Al hacer clic en el botón de editar, se cargan los datos de la tarea seleccionada en el formulario para que puedan ser modificados.
   const prepararEdicion = (tarea) => {
     // Al dar clic en editar, cargamos los datos de la fila en el formulario
-    setFormulario(tarea);
+    setFormulario({ ...tarea, status: tarea.status || 'Pendiente' });
   };
 
   //Función para eliminar una tarea. Al hacer clic en el botón de eliminar, se muestra una confirmación y si el usuario confirma, se hace una petición DELETE a la API para eliminar la tarea seleccionada.
@@ -107,7 +107,7 @@ export default function VistaTareas() {
       </div>
 
       {/* FORMULARIO INLINE */}
-      <div className="inline-form">
+      <div className="inline-form" style={{ gridTemplateColumns: '2fr 2fr 2fr 2fr auto' }}>
         <div className="form-group">
           <label>Título</label>
           <input type="text" className="form-control" placeholder="Ej. Estudiar React"
@@ -128,6 +128,15 @@ export default function VistaTareas() {
             ))}
           </select>
         </div>
+        <div className="form-group">
+          <label>Estado</label>
+          <select className="form-control" 
+            value={formulario.status} onChange={e => setFormulario({...formulario, status: e.target.value})}>
+            <option value="Pendiente">Pendiente</option>
+            <option value="Completada">Completada</option>
+          </select>
+        </div>
+
         <button className="btn btn-primary" style={{height: '38px'}} onClick={guardarTarea}>
           {formulario.id_task ? 'Actualizar' : 'Guardar'}
         </button>
@@ -140,12 +149,14 @@ export default function VistaTareas() {
             <th>Título</th>
             <th>Descripción</th>
             <th>Usuario</th>
+            <th>Estado</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
           {tareas.map(tarea => {
             const user = usuarios.find(u => u.id_user === parseInt(tarea.id_user));
+            const estadoActual = tarea.status || 'Pendiente';
             return (
               <tr key={tarea.id_task}>
                 <td>{tarea.id_task}</td>
@@ -154,6 +165,13 @@ export default function VistaTareas() {
                 <td>
                   {user ? <span className={`badge ${getBadgeClass(user.id_user)}`}>{user.name}</span> : 'Sin asignar'}
                 </td>
+
+                <td>
+                  <span className={`badge ${estadoActual === 'Completada' ? 'badge-green' : 'badge-yellow'}`}>
+                    {estadoActual}
+                  </span>
+                </td> 
+
                 <td>
                   <div className="actions">
                     {/* Botón Editar conectado a la función */}
