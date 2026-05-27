@@ -1,2 +1,4 @@
 #Dependencias de backend
 node_modules
+.env
+/db
