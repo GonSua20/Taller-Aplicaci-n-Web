@@ -39,6 +39,32 @@ export default function VistaUsuarios() {
   const guardarUsuario = async () => {
     // Validación simple para asegurarse de que los campos de nombre y correo no estén vacíos antes de enviar la petición.
     if(!formulario.name || !formulario.email) return alert("Llena todos los campos");
+
+    //Validaciones de duplicados
+    // Normalizamos el texto (quitamos espacios al inicio/fin y pasamos a minúsculas) para que "Nombre" y "nombre" se consideren iguales.
+    const nombreNormalizado = formulario.name.trim().toLowerCase();
+    const correoNormalizado = formulario.email.trim().toLowerCase();
+
+    // Verificamos si existe otro usuario con el mismo nombre
+    const nombreDuplicado = usuarios.some(
+      u => u.name.trim().toLowerCase() === nombreNormalizado && u.id_user !== formulario.id_user
+    );
+
+    // Verificamos si existe otro usuario con el mismo correo
+    const correoDuplicado = usuarios.some(
+      u => u.email.trim().toLowerCase() === correoNormalizado && u.id_user !== formulario.id_user
+    );
+
+    // Si encontramos duplicados, detenemos la ejecución y avisamos
+    if (nombreDuplicado) {
+        return alert(`El nombre "${formulario.name}" ya está registrado. Por favor, usa otro.`);
+    }
+
+    if (correoDuplicado) {
+        return alert(`El correo "${formulario.email}" ya está en uso. Por favor, ingresa uno diferente.`);
+    }
+
+
     // Se utiliza un bloque try-catch para manejar posibles errores en la petición.
     try {
       // Si el formulario tiene un id_user, significa que estamos editando un usuario existente, por lo que se hace una petición PUT a la ruta correspondiente.
@@ -56,6 +82,7 @@ export default function VistaUsuarios() {
     } 
     // Si ocurre un error durante la petición, se captura y se muestra un mensaje de error en la consola.
     catch (error) { console.error("Error al guardar", error); }
+    console.error("Error al guardar usuario", error);
   };
 
   //Función para preparar la edición de un usuario. Al hacer clic en el botón de editar, se cargan los datos del usuario seleccionado en el formulario para que puedan ser modificados.
