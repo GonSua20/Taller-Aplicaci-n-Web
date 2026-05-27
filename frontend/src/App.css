@@ -1,38 +1,63 @@
-.App {
-  text-align: center;
+:root {
+  --primary: #5a5ce6;
+  --sidebar-bg: #1e2235;
+  --sidebar-hover: #2a2e45;
+  --bg-light: #f8f9fc;
+  --text-dark: #333;
+  --text-muted: #888;
+  --border: #eef0f4;
+  --danger: #ef4444;
+  --info: #3b82f6;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
+body { background-color: var(--bg-light); color: var(--text-dark); }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
+.app-container { display: flex; min-height: 100vh; }
 
-.App-link {
-  color: #61dafb;
-}
+/* Sidebar */
+.sidebar { width: 260px; background-color: var(--sidebar-bg); color: white; padding: 20px 0; display: flex; flex-direction: column; }
+.sidebar-brand { padding: 0 20px 30px; display: flex; align-items: center; gap: 12px; }
+.brand-icon { background: var(--primary); padding: 8px; border-radius: 8px; }
+.brand-text h1 { font-size: 1.1rem; font-weight: 600; }
+.brand-text p { font-size: 0.75rem; color: #a0a5b8; }
+.nav-item { padding: 15px 25px; cursor: pointer; display: flex; align-items: center; gap: 12px; color: #a0a5b8; text-decoration: none; transition: 0.2s; }
+.nav-item:hover { background: var(--sidebar-hover); color: white; }
+.nav-item.active { background: var(--primary); color: white; border-radius: 0 20px 20px 0; margin-right: 20px; }
+.sidebar-footer { margin-top: auto; padding: 20px; font-size: 0.75rem; color: #6b7280; }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
+/* Main Content */
+.main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+.topbar { background: white; padding: 15px 30px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid var(--border); }
+.topbar h2 { font-size: 1.1rem; font-weight: 500; }
+.content-area { padding: 30px; }
+
+/* Cards & Tables */
+.card { background: white; border-radius: 12px; padding: 25px; margin-bottom: 30px; border: 1px solid var(--border); }
+.card-header { display: flex; justify-content: space-between; margin-bottom: 25px; }
+.card-title h3 { color: var(--primary); display: flex; align-items: center; gap: 8px; font-size: 1.2rem; }
+.card-title p { color: var(--text-muted); font-size: 0.85rem; margin-top: 5px; }
+
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 15px 10px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+th { color: var(--text-dark); font-weight: 600; }
+
+/* Forms */
+.inline-form { display: grid; grid-template-columns: 2fr 3fr 2fr auto; gap: 15px; align-items: end; margin-bottom: 30px; }
+.form-group label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 8px; }
+.form-control { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; outline: none; }
+.form-control:focus { border-color: var(--primary); }
+
+/* Buttons & Badges */
+.btn { padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; }
+.btn-primary { background: var(--primary); color: white; }
+.btn-icon { padding: 8px; color: white; border-radius: 6px; }
+.btn-edit { background: var(--info); }
+.btn-delete { background: var(--danger); }
+.actions { display: flex; gap: 8px; }
+
+.badge { padding: 5px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500; }
+.badge-blue { background: #e0f2fe; color: #0284c7; }
+.badge-green { background: #dcfce7; color: #16a34a; }
+.badge-yellow { background: #fef9c3; color: #ca8a04; }
