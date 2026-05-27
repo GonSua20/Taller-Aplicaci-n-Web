@@ -52,11 +52,11 @@ export default function VistaTareas() {
     try {
       // Si el formulario tiene un id_task, significa que estamos editando una tarea existente, por lo que se hace una petición PUT a la ruta correspondiente. Si no tiene id_task, se crea una nueva tarea con una petición POST.
       if (formulario.id_task) {
-        // Actualizar (PUT)
-        await clienteAxios.put(`/tasks/${formulario.id_task}`, formulario);
+        // Actualizar (PATCH)
+        await clienteAxios.patch(`/tasks/${formulario.id_task}`, formulario);
         // Actualizamos la tabla localmente
         setTareas(tareas.map(t => t.id_task === formulario.id_task ? formulario : t));
-        // Si hay ID, es una actualización (PUT)
+        // Si hay ID, es una actualización (PATCH)
       } else {
         // Crear (POST)
         const res = await clienteAxios.post('/tasks', formulario);

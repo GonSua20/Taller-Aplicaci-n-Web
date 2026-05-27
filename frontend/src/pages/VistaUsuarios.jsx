@@ -43,8 +43,8 @@ export default function VistaUsuarios() {
     try {
       // Si el formulario tiene un id_user, significa que estamos editando un usuario existente, por lo que se hace una petición PUT a la ruta correspondiente.
       if (formulario.id_user) {
-        // Si hay ID, es una actualización (PUT)
-        await clienteAxios.put(`/users/${formulario.id_user}`, formulario);
+        // Si hay ID, es una actualización (PATCH)
+        await clienteAxios.patch(`/users/${formulario.id_user}`, formulario);
         // Actualizamos la tabla localmente
         setUsuarios(usuarios.map(u => u.id_user === formulario.id_user ? formulario : u));
       } else {
@@ -81,7 +81,7 @@ export default function VistaUsuarios() {
     catch (error) { console.error("Error al eliminar", error); }
   };
 
-  
+
   return (
     <div className="card">
       <div className="card-header">
