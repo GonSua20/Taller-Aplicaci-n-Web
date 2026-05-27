@@ -63,6 +63,7 @@ export default function VistaTareas() {
       setFormulario({ id_task: null, title: '', description: '', id_user: '', status: false });
       // Si ocurre un error durante la petición, se captura y se muestra un mensaje de error en la consola.
     } catch (error) { console.error("Error al guardar tarea", error); }
+    
   };
 
   //Función para preparar la edición de una tarea. Al hacer clic en el botón de editar, se cargan los datos de la tarea seleccionada en el formulario para que puedan ser modificados.
@@ -117,7 +118,7 @@ export default function VistaTareas() {
         <div className="form-group">
           <label>Usuario</label>
           <select className="form-control" 
-            value={formulario.id_user} onChange={e => setFormulario({...formulario, id_user: e.target.value})}>
+            value={formulario.id_user} onChange={e => setFormulario({...formulario, id_user: parseInt(e.target.value) || ''})}>
             <option value="">Selecciona un usuario</option>
             {usuarios.map(u => (
               <option key={u.id_user} value={u.id_user}>{u.name}</option>
