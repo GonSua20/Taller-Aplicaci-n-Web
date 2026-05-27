@@ -45,14 +45,12 @@ export default function VistaUsuarios() {
       if (formulario.id_user) {
         // Si hay ID, es una actualización (PATCH)
         await clienteAxios.patch(`/users/${formulario.id_user}`, formulario);
-        // Actualizamos la tabla localmente
-        setUsuarios(usuarios.map(u => u.id_user === formulario.id_user ? formulario : u));
       } else {
-        // Si no hay ID, es uno nuevo (POST)
-        const res = await clienteAxios.post('/users', formulario);
-        // Agregamos el nuevo usuario a la tabla localmente
-        setUsuarios([...usuarios, res.data]);
+        // Si no hay ID, es una creación (POST)
+        await clienteAxios.post('/users', formulario);
       }
+
+      cargarUsuarios(); // Recargamos la lista de usuarios para reflejar los cambios
       // Limpiamos el formulario después de guardar
       setFormulario({ id_user: null, name: '', email: '' });
     } 
