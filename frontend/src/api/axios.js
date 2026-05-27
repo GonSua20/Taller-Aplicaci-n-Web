@@ -5,8 +5,8 @@ import axios from 'axios';
 const clienteAxios = axios.create({
   
   //Definimos la URL para las solicitudes a la API, en este caso, 
-  // se asume que la API está corriendo en localhost en el puerto 3000
-  baseURL: 'http://localhost:3000/api', 
+  // se asume que la API está corriendo en localhost en el puerto 3001
+  baseURL: 'http://localhost:3001/api', 
   //Definimos los encabezados para las solicitudes, indicando que el contenido es JSON
   headers: {
  //El encabezado 'Content-Type' se establece en 'application/json' para indicar que el cuerpo de las solicitudes será en formato JSON
