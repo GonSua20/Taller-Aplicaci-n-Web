@@ -82,7 +82,6 @@ export default function VistaUsuarios() {
     } 
     // Si ocurre un error durante la petición, se captura y se muestra un mensaje de error en la consola.
     catch (error) { console.error("Error al guardar", error); }
-    console.error("Error al guardar usuario", error);
   };
 
   //Función para preparar la edición de un usuario. Al hacer clic en el botón de editar, se cargan los datos del usuario seleccionado en el formulario para que puedan ser modificados.
