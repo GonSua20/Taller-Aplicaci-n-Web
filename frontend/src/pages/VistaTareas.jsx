@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import clienteAxios from '../api/axios';
-import { ClipboardList, Plus, Edit2, Trash2 } from 'lucide-react';
+import { ClipboardList, Edit2, Trash2 } from 'lucide-react';
 
 export default function VistaTareas() {
   const [tareas, setTareas] = useState([]);
-  const [usuarios, setUsuarios] = useState([]); // Para poblar el select
+  const [usuarios, setUsuarios] = useState([]);
   
-  const [nuevaTarea, setNuevaTarea] = useState({
-    title: '', description: '', id_user: ''
+  // Estado para el formulario unificado
+  const [formulario, setFormulario] = useState({
+    id_task: null, title: '', description: '', id_user: ''
   });
 
   useEffect(() => {
     cargarDatos();
   }, []);
 
+  // --- OBTENER (READ) ---
   const cargarDatos = async () => {
     try {
       const [resTareas, resUsuarios] = await Promise.all([
@@ -22,35 +24,41 @@ export default function VistaTareas() {
       ]);
       setTareas(resTareas.data);
       setUsuarios(resUsuarios.data);
-    } catch (error) {
-      console.error("Error cargando datos", error);
-    }
+    } catch (error) { console.error("Error cargando datos", error); }
   };
 
-  const handleGuardar = async () => {
-    if(!nuevaTarea.title || !nuevaTarea.id_user) {
-        return alert("El título y el usuario son obligatorios");
-    }
+  // --- AGREGAR y EDITAR (CREATE / UPDATE) ---
+  const guardarTarea = async () => {
+    if(!formulario.title || !formulario.id_user) return alert("Título y Usuario obligatorios");
+    
     try {
-      const res = await clienteAxios.post('/tasks', nuevaTarea);
-      setTareas([...tareas, res.data]); // Actualiza la UI
-      setNuevaTarea({ title: '', description: '', id_user: '' }); // Limpia el formulario
-    } catch (error) {
-      console.error("Error al guardar tarea", error);
-    }
+      if (formulario.id_task) {
+        // Actualizar (PUT)
+        await clienteAxios.put(`/tasks/${formulario.id_task}`, formulario);
+        setTareas(tareas.map(t => t.id_task === formulario.id_task ? formulario : t));
+      } else {
+        // Crear (POST)
+        const res = await clienteAxios.post('/tasks', formulario);
+        setTareas([...tareas, res.data]);
+      }
+      setFormulario({ id_task: null, title: '', description: '', id_user: '' });
+    } catch (error) { console.error("Error al guardar tarea", error); }
   };
 
+  // --- PREPARAR EDICIÓN ---
+  const prepararEdicion = (tarea) => {
+    setFormulario(tarea);
+  };
+
+  // --- ELIMINAR (DELETE) ---
   const eliminarTarea = async (id_task) => {
-    if(!window.confirm("¿Estás seguro de eliminar esta tarea?")) return;
+    if(!window.confirm("¿Seguro de eliminar esta tarea?")) return;
     try {
       await clienteAxios.delete(`/tasks/${id_task}`);
       setTareas(tareas.filter(t => t.id_task !== id_task));
-    } catch (error) {
-      console.error("Error al eliminar", error);
-    }
+    } catch (error) { console.error("Error al eliminar", error); }
   };
 
-  // Función visual para darle un color distinto a la etiqueta de cada usuario
   const getBadgeClass = (id) => {
     const badges = ['badge-blue', 'badge-green', 'badge-yellow'];
     return badges[(id || 0) % badges.length];
@@ -63,7 +71,6 @@ export default function VistaTareas() {
           <h3><ClipboardList size={20} /> Tareas</h3>
           <p>Administra las tareas del sistema.</p>
         </div>
-        <button className="btn btn-primary"><Plus size={16}/> Nueva Tarea</button>
       </div>
 
       {/* FORMULARIO INLINE */}
@@ -71,27 +78,28 @@ export default function VistaTareas() {
         <div className="form-group">
           <label>Título</label>
           <input type="text" className="form-control" placeholder="Ej. Estudiar React"
-            value={nuevaTarea.title} onChange={e => setNuevaTarea({...nuevaTarea, title: e.target.value})} />
+            value={formulario.title} onChange={e => setFormulario({...formulario, title: e.target.value})} />
         </div>
         <div className="form-group">
           <label>Descripción</label>
-          <input type="text" className="form-control" placeholder="Descripción de la tarea..."
-            value={nuevaTarea.description} onChange={e => setNuevaTarea({...nuevaTarea, description: e.target.value})} />
+          <input type="text" className="form-control" placeholder="Descripción..."
+            value={formulario.description} onChange={e => setFormulario({...formulario, description: e.target.value})} />
         </div>
         <div className="form-group">
-          <label>Usuario Responsable</label>
+          <label>Usuario</label>
           <select className="form-control" 
-            value={nuevaTarea.id_user} onChange={e => setNuevaTarea({...nuevaTarea, id_user: e.target.value})}>
+            value={formulario.id_user} onChange={e => setFormulario({...formulario, id_user: e.target.value})}>
             <option value="">Selecciona un usuario</option>
             {usuarios.map(u => (
               <option key={u.id_user} value={u.id_user}>{u.name}</option>
             ))}
           </select>
         </div>
-        <button className="btn btn-primary" style={{height: '38px'}} onClick={handleGuardar}>Guardar</button>
+        <button className="btn btn-primary" style={{height: '38px'}} onClick={guardarTarea}>
+          {formulario.id_task ? 'Actualizar' : 'Guardar'}
+        </button>
       </div>
 
-      {/* TABLA */}
       <table>
         <thead>
           <tr>
@@ -104,7 +112,6 @@ export default function VistaTareas() {
         </thead>
         <tbody>
           {tareas.map(tarea => {
-            // Buscamos el nombre del usuario comparando el id_user de la tarea con la lista de usuarios
             const user = usuarios.find(u => u.id_user === parseInt(tarea.id_user));
             return (
               <tr key={tarea.id_task}>
@@ -116,16 +123,14 @@ export default function VistaTareas() {
                 </td>
                 <td>
                   <div className="actions">
-                    <button className="btn btn-icon btn-edit"><Edit2 size={14}/></button>
+                    {/* Botón Editar conectado a la función */}
+                    <button onClick={() => prepararEdicion(tarea)} className="btn btn-icon btn-edit"><Edit2 size={14}/></button>
                     <button onClick={() => eliminarTarea(tarea.id_task)} className="btn btn-icon btn-delete"><Trash2 size={14}/></button>
                   </div>
                 </td>
               </tr>
             );
           })}
-          {tareas.length === 0 && (
-            <tr><td colSpan="5" style={{textAlign: 'center', color: '#888'}}>No hay tareas registradas.</td></tr>
-          )}
         </tbody>
       </table>
     </div>
